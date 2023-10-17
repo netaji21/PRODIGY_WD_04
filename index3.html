@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin: 20px;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            margin: 20px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #ffff99;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        button {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        #status {
+            font-size: 24px;
+            margin: 20px;
+        }
+
+        #start-screen {
+            background-color: #ffff99;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #start-button {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #start-button:hover {
+            background-color: #ff9900;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <div id="start-screen">
+        <button id="start-button" onclick="startGameAgainstAI()">Play Against AI</button>
+        <button id="start-button" onclick="startGameAgainstPlayer()">Play Against Another Player</button>
+    </div>
+    <div class="game-container" style="display: none;">
+        <div class="cell" id="0" onclick="handleCellClick(0)"></div>
+        <div class="cell" id="1" onclick="handleCellClick(1)"></div>
+        <div class="cell" id="2" onclick="handleCellClick(2)"></div>
+        <div class="cell" id="3" onclick="handleCellClick(3)"></div>
+        <div class="cell" id="4" onclick="handleCellClick(4)"></div>
+        <div class="cell" id="5" onclick="handleCellClick(5)"></div>
+        <div class="cell" id="6" onclick="handleCellClick(6)"></div>
+        <div class="cell" id="7" onclick="handleCellClick(7)"></div>
+        <div class="cell" id="8" onclick="handleCellClick(8)"></div>
+    </div>
+    <button id="reset-button" style="display: none;" onclick="resetGame()">Reset</button>
+    <p id="status"></p>
+    <script>
+        // Initialize variables
+        const cells = document.querySelectorAll(".cell");
+        const resetButton = document.getElementById("reset-button");
+        const status = document.getElementById("status");
+        let currentPlayer = "X";
+        let gameBoard = ["", "", "", "", "", "", "", "", ""];
+        let gameActive = false;
+        let isAIPlaying = false;
+
+        // Function to handle a cell click
+        function handleCellClick(cellIndex) {
+            if (gameBoard[cellIndex] === "" && gameActive) {
+                gameBoard[cellIndex] = currentPlayer;
+                cells[cellIndex].textContent = currentPlayer;
+
+                if (checkWin()) {
+                    status.textContent = `Player ${currentPlayer} wins!`;
+                    gameActive = false;
+                } else if (isBoardFull()) {
+                    status.textContent = "It's a draw!";
+                    gameActive = false;
+                } else {
+                    currentPlayer = currentPlayer === "X" ? "O" : "X";
+                    if (currentPlayer === "O" && gameActive && isAIPlaying) {
+                        playAI();
+                    }
+                }
+            }
+        }
+
+        // Function to make the AI play
+        function playAI() {
+            let emptyCells = gameBoard.reduce((acc, cell, index) => (cell === "" ? acc.concat(index) : acc), []);
+            if (emptyCells.length > 0) {
+                const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                handleCellClick(randomIndex);
+            }
+        }
+
+        // Start the game against AI
+        function startGameAgainstAI() {
+            gameActive = true;
+            isAIPlaying = true;
+            document.getElementById("start-screen").style.display = "none";
+            document.querySelector(".game-container").style.display = "grid";
+            document.getElementById("reset-button").style.display = "block";
+            resetGame();
+        }
+
+        // Start the game against another player
+        function startGameAgainstPlayer() {
+            gameActive = true;
+            isAIPlaying = false;
+            document.getElementById("start-screen").style.display = "none";
+            document.querySelector(".game-container").style.display = "grid";
+            document.getElementById("reset-button").style.display = "block";
+            resetGame();
+        }
+
+        // Function to check for a win
+        function checkWin() {
+            const winningCombos = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            for (const combo of winningCombos) {
+                const [a, b, c] = combo;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Function to check if the board is full (a draw)
+        function isBoardFull() {
+            return gameBoard.every((cell) => cell !== "");
+        }
+
+        // Function to reset the game
+        function resetGame() {
+            currentPlayer = "X";
+            gameBoard = ["", "", "", "", "", "", "", "", ""];
+            gameActive = true;
+            status.textContent = "";
+            cells.forEach((cell) => {
+                cell.textContent = "";
+            });
+            if (isAIPlaying && currentPlayer === "O") {
+                playAI();
+            }
+        }
+    </script>
+</body>
+</html>

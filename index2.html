@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background: #FFC0CB; /* Pink background color */
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .stopwatch {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .time {
+      font-size: 3em;
+      margin: 20px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.5em;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #FF69B4; /* Pink button color */
+      color: #fff;
+    }
+
+    button:hover {
+      background-color: #FF1493; /* Darker pink on hover */
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    li {
+      font-size: 1.5em;
+      color: red; /* Lap timings in red */
+    }
+  </style>
+</head>
+<body>
+  <div class="stopwatch">
+    <div class="time" id="display">00:00:00</div>
+    <button id="startStop" onclick="startStop()">Start</button>
+    <button id="reset" onclick="reset()">Reset</button>
+    <button id="lap" onclick="recordLap()">Lap</button>
+  </div>
+  <ul id="laps"></ul>
+
+  <script>
+    let isRunning = false;
+    let startTime;
+    let interval;
+
+    function startStop() {
+      if (isRunning) {
+        clearInterval(interval);
+        document.getElementById("startStop").innerText = "Start";
+      } else {
+        startTime = startTime ? startTime : Date.now();
+        interval = setInterval(updateDisplay, 10);
+        document.getElementById("startStop").innerText = "Stop";
+      }
+      isRunning = !isRunning;
+    }
+
+    function reset() {
+      clearInterval(interval);
+      isRunning = false;
+      startTime = null;
+      document.getElementById("display").innerText = "00:00:00";
+      document.getElementById("startStop").innerText = "Start";
+      document.getElementById("laps").innerHTML = "";
+    }
+
+    function recordLap() {
+      if (isRunning) {
+        const currentTime = Date.now() - startTime;
+        const lapTime = formatTime(currentTime);
+        const lapItem = document.createElement("li");
+        lapItem.innerText = lapTime;
+        document.getElementById("laps").appendChild(lapItem);
+      }
+    }
+
+    function updateDisplay() {
+      const currentTime = Date.now() - startTime;
+      const timeStr = formatTime(currentTime);
+      document.getElementById("display").innerText = timeStr;
+    }
+
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60000);
+      const seconds = Math.floor((time % 60000) / 1000);
+      const milliseconds = (time % 1000).toString().slice(0, 2);
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds}`;
+    }
+  </script>
+</body>
+</html>
